@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["nodejs-20_x", "npm"]
+nixPkgs = ["nodejs_20", "npm-10_x"]
 
 [phases.install]
 cmds = ["npm ci"]
@@ -8,5 +8,5 @@ cmds = ["npm ci"]
 cmds = ["echo 'No build step needed'"]
 
 [start]
-cmd = "node scripts/start-automation.js"
+cmd = "node scripts/start-fullstack.js"
 

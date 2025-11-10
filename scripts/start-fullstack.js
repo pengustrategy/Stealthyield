@@ -32,18 +32,14 @@ if (process.env.DEPLOYER_PRIVATE_KEY_BASE58) {
   }
 }
 
-if (process.env.MOTHERWOMB_PRIVATE_KEY_BASE58) {
-  try {
-    const privateKeyBytes = bs58.decode(process.env.MOTHERWOMB_PRIVATE_KEY_BASE58);
-    const keypairArray = Array.from(privateKeyBytes);
-    fs.writeFileSync('./wallets/motherwomb-wallet.json', JSON.stringify(keypairArray));
-    fs.chmodSync('./wallets/motherwomb-wallet.json', 0o600);
-    process.env.MOTHERWOMB_WALLET_PATH = './wallets/motherwomb-wallet.json';
-    console.log('✅ MotherWomb wallet created');
-  } catch (error) {
-    console.error('⚠️  MotherWomb wallet error:', error.message);
-  }
+// MotherWomb address (no private key needed - only for receiving SOL)
+if (!process.env.MOTHERWOMB_ADDRESS) {
+  // Use default from config
+  process.env.MOTHERWOMB_ADDRESS = '5kegRGctwKkdvytig8CeCAzuBQWivTvEtgyePtyVcgtk';
+  console.log('✅ Using default MotherWomb address');
 }
+
+console.log('MotherWomb Address:', process.env.MOTHERWOMB_ADDRESS);
 
 // Verify
 if (!fs.existsSync(process.env.DEPLOYER_WALLET_PATH || './wallets/deployer-wallet.json')) {
