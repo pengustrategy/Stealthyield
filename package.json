@@ -10,8 +10,6 @@
     "frontend": "cd frontend && npm run dev"
   },
   "dependencies": {
-    "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
-    "@pinata/sdk": "^2.1.0",
     "@solana/spl-token": "^0.4.8",
     "@solana/web3.js": "^1.95.0",
     "bs58": "^6.0.0",

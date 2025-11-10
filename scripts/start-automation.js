@@ -5,35 +5,61 @@
 
 const { exec } = require('child_process');
 const fs = require('fs');
+const bs58 = require('bs58');
 
 console.log('\n🤖 Stealthyield Automation Starting...\n');
 console.log('Time:', new Date().toISOString());
 console.log('Environment: Railway\n');
 
-// Handle Base64 encoded wallets (for Railway)
-if (process.env.DEPLOYER_WALLET_BASE64) {
-  console.log('📦 Decoding wallet from Base64...');
-  const walletData = Buffer.from(process.env.DEPLOYER_WALLET_BASE64, 'base64').toString('utf-8');
+// Ensure wallets directory exists
+if (!fs.existsSync('./wallets')) {
+  fs.mkdirSync('./wallets', { recursive: true });
+}
+
+// Handle Base58 private key (Solana standard format) - Recommended
+if (process.env.DEPLOYER_PRIVATE_KEY_BASE58) {
+  console.log('📦 Converting Base58 private key to keypair...');
   
-  // Ensure wallets directory exists
-  if (!fs.existsSync('./wallets')) {
-    fs.mkdirSync('./wallets', { recursive: true });
+  try {
+    const privateKeyBytes = bs58.decode(process.env.DEPLOYER_PRIVATE_KEY_BASE58);
+    const keypairArray = Array.from(privateKeyBytes);
+    
+    fs.writeFileSync('./wallets/deployer-wallet.json', JSON.stringify(keypairArray));
+    fs.chmodSync('./wallets/deployer-wallet.json', 0o600);
+    
+    process.env.DEPLOYER_WALLET_PATH = './wallets/deployer-wallet.json';
+    console.log('✅ Deployer wallet created from Base58');
+  } catch (error) {
+    console.error('❌ Failed to decode Base58 private key:', error.message);
+    process.exit(1);
   }
+}
+
+if (process.env.MOTHERWOMB_PRIVATE_KEY_BASE58) {
+  try {
+    const privateKeyBytes = bs58.decode(process.env.MOTHERWOMB_PRIVATE_KEY_BASE58);
+    const keypairArray = Array.from(privateKeyBytes);
+    
+    fs.writeFileSync('./wallets/motherwomb-wallet.json', JSON.stringify(keypairArray));
+    fs.chmodSync('./wallets/motherwomb-wallet.json', 0o600);
+    
+    process.env.MOTHERWOMB_WALLET_PATH = './wallets/motherwomb-wallet.json';
+    console.log('✅ MotherWomb wallet created from Base58');
+  } catch (error) {
+    console.error('❌ Failed to decode MotherWomb Base58:', error.message);
+  }
+}
+
+// Fallback: Handle Base64 encoded JSON array (alternative method)
+if (!process.env.DEPLOYER_WALLET_PATH && process.env.DEPLOYER_WALLET_BASE64) {
+  console.log('📦 Using Base64 JSON array fallback...');
+  const walletData = Buffer.from(process.env.DEPLOYER_WALLET_BASE64, 'base64').toString('utf-8');
   
   fs.writeFileSync('./wallets/deployer-wallet.json', walletData);
   fs.chmodSync('./wallets/deployer-wallet.json', 0o600);
   
   process.env.DEPLOYER_WALLET_PATH = './wallets/deployer-wallet.json';
-  console.log('✅ Deployer wallet decoded');
-}
-
-if (process.env.MOTHERWOMB_WALLET_BASE64) {
-  const walletData = Buffer.from(process.env.MOTHERWOMB_WALLET_BASE64, 'base64').toString('utf-8');
-  fs.writeFileSync('./wallets/motherwomb-wallet.json', walletData);
-  fs.chmodSync('./wallets/motherwomb-wallet.json', 0o600);
-  
-  process.env.MOTHERWOMB_WALLET_PATH = './wallets/motherwomb-wallet.json';
-  console.log('✅ MotherWomb wallet decoded');
+  console.log('✅ Deployer wallet decoded from Base64');
 }
 
 // Verify configuration
