@@ -6,7 +6,8 @@
     "deploy-token": "./scripts/deploy-styd.sh",
     "auto-fees": "node scripts/auto-process-fees.js",
     "distribute": "node scripts/distribute-rewards.js",
-    "start": "node scripts/start-automation.js",
+    "start": "node scripts/start-fullstack.js",
+    "automation-only": "node scripts/start-automation.js",
     "frontend": "cd frontend && npm run dev"
   },
   "dependencies": {
