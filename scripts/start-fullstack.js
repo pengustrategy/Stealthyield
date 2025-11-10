@@ -78,11 +78,15 @@ console.log(`✅ Automation scheduled: every ${INTERVAL / 60000} minutes\n`);
 // Start Next.js frontend
 console.log('🎨 Starting Next.js frontend...\n');
 
-const nextjs = spawn('npm', ['run', 'dev', '--prefix', 'frontend'], {
+// Railway provides PORT environment variable
+const PORT = process.env.PORT || 3000;
+console.log(`Frontend will run on port: ${PORT}\n`);
+
+const nextjs = spawn('npm', ['run', 'start', '--prefix', 'frontend'], {
   stdio: 'inherit',
   env: {
     ...process.env,
-    PORT: process.env.PORT || 3000,
+    PORT: PORT,
   }
 });
 
