@@ -169,8 +169,8 @@ export function useBreederRankings(tokenMint: string, lpMint: string, threshold:
           if (lpAmount === 0) continue;
           
           // Find corresponding STYD balance
-          const stydHolder = stydHolders.find((h: any) => h.owner === lpHolder.owner);
-          const stydBalance = stydHolder ? (stydHolder.amount || 0) / 1e9 : 0;
+          const stydHolder = (stydHolders as any[]).find((h: any) => h.owner === lpHolder.owner);
+          const stydBalance = stydHolder ? ((stydHolder.amount as number) || 0) / 1e9 : 0;
           
           if (stydBalance >= threshold) {
             breederList.push({
