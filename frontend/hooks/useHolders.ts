@@ -85,13 +85,13 @@ export function useTopMilkers(tokenMint: string, threshold: number = 500) {
         const holders = await fetchTokenHolders(tokenMint);
         
         // Filter Milkers (≥ threshold, exclude LP providers)
-        const milkerHolders = holders
+        const milkerHolders = (holders as any[])
           .filter((h: any) => {
-            const balance = h.amount / 1e9;
+            const balance = (h.amount || 0) / 1e9;
             return balance >= threshold;
           })
           .map((h: any) => {
-            const balance = h.amount / 1e9;
+            const balance = (h.amount || 0) / 1e9;
             return {
               address: h.owner.slice(0, 4) + '...' + h.owner.slice(-4),
               fullAddress: h.owner,
@@ -164,13 +164,13 @@ export function useBreederRankings(tokenMint: string, lpMint: string, threshold:
         // Match holders who have both STYD ≥ threshold AND LP
         const breederList: Breeder[] = [];
         
-        for (const lpHolder of lpHolders) {
-          const lpAmount = lpHolder.amount / 1e9;
+        for (const lpHolder of lpHolders as any[]) {
+          const lpAmount = (lpHolder.amount || 0) / 1e9;
           if (lpAmount === 0) continue;
           
           // Find corresponding STYD balance
           const stydHolder = stydHolders.find((h: any) => h.owner === lpHolder.owner);
-          const stydBalance = stydHolder ? stydHolder.amount / 1e9 : 0;
+          const stydBalance = stydHolder ? (stydHolder.amount || 0) / 1e9 : 0;
           
           if (stydBalance >= threshold) {
             breederList.push({
