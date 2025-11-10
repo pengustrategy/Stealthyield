@@ -228,11 +228,10 @@ function calculateSOLReward(userLP, totalLP, percentage) {
 
 async function fetchHolders(connection, mint) {
   // TODO: In production, use getProgramAccounts or indexer
-  // For now, return mock data
-  return [
-    { address: new PublicKey('...'), balance: 1000 * 1e9, hasLP: false },
-    // Add more holders
-  ];
+  // For now, return empty array until real implementation
+  console.log('  ⚠️  Holder querying not implemented yet');
+  console.log('  Skipping distribution (no holders to query)\n');
+  return [];
 }
 
 function loadState() {
