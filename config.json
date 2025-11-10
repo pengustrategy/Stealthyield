@@ -1,0 +1,48 @@
+{
+  "wallets": {
+    "deployer": {
+      "address": "GzV4DVTaZJuPXjJS5o57m85PEJRKDaFubFw2pYCPqWPY",
+      "path": "./wallets/deployer-wallet.json",
+      "role": "Token creator, mint authority, and withdrawWithheldAuthority"
+    },
+    "motherwomb": {
+      "address": "5kegRGctwKkdvytig8CeCAzuBQWivTvEtgyePtyVcgtk",
+      "path": "./wallets/motherwomb-wallet.json",
+      "role": "SOL rewards pool for Breeders (separate from deployer for clarity)"
+    }
+  },
+  "network": {
+    "cluster": "mainnet-beta",
+    "rpcUrl": "https://mainnet.helius-rpc.com/?api-key=ffddb707-229a-42ff-b334-42e983de9db8"
+  },
+  "token": {
+    "mint": "4spgGcQcHrAXEZfLs5hWJgYNmXcA7mjjiYRMoob1Wz9b",
+    "name": "STYD",
+    "symbol": "STYD",
+    "logoURI": "https://gateway.pinata.cloud/ipfs/bafybeiccyccmz42omboii4jfyesxwqzddfrdeg6gu5hpf2r55tugkcxe5a",
+    "metadataURI": "https://gateway.pinata.cloud/ipfs/bafkreifae6czz6olfosp5os3ppo7rloof5mvnkyrc6itdh3li2lqeqx5ve",
+    "decimals": 9,
+    "transferFeeBasisPoints": 500,
+    "maxFee": "1000000000000",
+    "tokenAccount": "DqDVxphzXXtWce2AEh5WT72DSNzpoV75d23aaCe3HKRq"
+  },
+  "economics": {
+    "initialSupply": 1000000,
+    "dailyEmission": 500000,
+    "emissionPer10Min": 3472,
+    "milkerThreshold": 500,
+    "breederThreshold": 1000,
+    "halvingThresholds": [2500000, 5000000, 7500000, 10000000, 12500000],
+    "phaseThresholds": [2500000, 5000000, 7500000],
+    "solUnlockPercentages": [5, 25, 50, 100]
+  },
+  "feeProcessing": {
+    "burnPercentage": 30,
+    "swapPercentage": 70,
+    "processingInterval": 600000
+  },
+  "raydium": {
+    "poolId": ""
+  }
+}
+

@@ -1,0 +1,38 @@
+# Private Keys - NEVER COMMIT
+wallets/*.json
+deployer-wallet.json
+motherwomb-wallet.json
+*.key
+*.pem
+
+# State files
+state.json
+styd-token-info.json
+
+# Node modules
+node_modules/
+frontend/node_modules/
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+distribution.log
+
+# Build
+target/
+frontend/.next/
+frontend/out/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+

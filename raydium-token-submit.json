@@ -1,0 +1,13 @@
+{
+  "address": "4spgGcQcHrAXEZfLs5hWJgYNmXcA7mjjiYRMoob1Wz9b",
+  "chainId": 101,
+  "decimals": 9,
+  "name": "STYD",
+  "symbol": "STYD",
+  "logoURI": "https://gateway.pinata.cloud/ipfs/bafybeiccyccmz42omboii4jfyesxwqzddfrdeg6gu5hpf2r55tugkcxe5a",
+  "tags": ["token-2022"],
+  "extensions": {
+    "website": "http://stealthyield.fun",
+    "twitter": "https://x.com/Stealthyield"
+  }
+}

@@ -1,0 +1,6 @@
+# Railway Ignore
+node_modules/
+frontend/
+.git/
+*.log
+.DS_Store

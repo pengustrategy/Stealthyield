@@ -1,0 +1,23 @@
+{
+  "name": "stealthyield",
+  "version": "2.0.0",
+  "description": "Stealthyield - A self-sustaining token ecosystem (Token 2022 + Offchain Distribution)",
+  "scripts": {
+    "deploy-token": "./scripts/deploy-styd.sh",
+    "auto-fees": "node scripts/auto-process-fees.js",
+    "distribute": "node scripts/distribute-rewards.js",
+    "start": "node scripts/start-automation.js",
+    "frontend": "cd frontend && npm run dev"
+  },
+  "dependencies": {
+    "@metaplex-foundation/mpl-token-metadata": "^3.4.0",
+    "@pinata/sdk": "^2.1.0",
+    "@solana/spl-token": "^0.4.8",
+    "@solana/web3.js": "^1.95.0",
+    "bs58": "^6.0.0",
+    "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.6.2"
+  }
+}
