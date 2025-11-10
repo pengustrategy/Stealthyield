@@ -84,6 +84,11 @@ async function distributeRewards() {
   // Fetch all holders (in production, query from RPC or indexer)
   const holders = await fetchHolders(connection, mintAddress);
   
+  if (holders.length === 0) {
+    console.log('⚠️  No holders found. Distribution skipped.\n');
+    return;
+  }
+  
   // Separate Milkers and Breeders
   const milkers = holders.filter(h => 
     h.balance >= CONFIG.MILKER_THRESHOLD * 1e9 && 
