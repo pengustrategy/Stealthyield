@@ -7,7 +7,6 @@ motherwomb-wallet.json
 
 # State files
 state.json
-styd-token-info.json
 
 # Node modules
 node_modules/

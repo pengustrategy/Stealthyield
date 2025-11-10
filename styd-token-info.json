@@ -1,0 +1,16 @@
+{
+  "mint": "4spgGcQcHrAXEZfLs5hWJgYNmXcA7mjjiYRMoob1Wz9b",
+  "name": "STYD",
+  "symbol": "STYD",
+  "logoURI": "https://gateway.pinata.cloud/ipfs/bafybeiccyccmz42omboii4jfyesxwqzddfrdeg6gu5hpf2r55tugkcxe5a",
+  "metadataURI": "https://gateway.pinata.cloud/ipfs/bafkreifae6czz6olfosp5os3ppo7rloof5mvnkyrc6itdh3li2lqeqx5ve",
+  "decimals": 9,
+  "authority": "GzV4DVTaZJuPXjJS5o57m85PEJRKDaFubFw2pYCPqWPY",
+  "tokenAccount": "DqDVxphzXXtWce2AEh5WT72DSNzpoV75d23aaCe3HKRq",
+  "initialSupply": 1000000,
+  "transferFee": 500,
+  "createdAt": "2025-11-10T08:00:00.000Z",
+  "website": "http://stealthyield.fun",
+  "twitter": "https://x.com/Stealthyield"
+}
+

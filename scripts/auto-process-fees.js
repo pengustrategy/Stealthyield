@@ -106,12 +106,19 @@ async function autoProcessFees() {
     TOKEN_2022_PROGRAM_ID
   );
   
-  const accountInfo = await getAccount(
-    connection,
-    deployerATA,
-    'confirmed',
-    TOKEN_2022_PROGRAM_ID
-  );
+  let accountInfo;
+  try {
+    accountInfo = await getAccount(
+      connection,
+      deployerATA,
+      'confirmed',
+      TOKEN_2022_PROGRAM_ID
+    );
+  } catch (error) {
+    console.log('⚠️  Deployer has no STYD account yet (all in LP pool)');
+    console.log('   Waiting for Transfer Fees to accumulate...\n');
+    return;
+  }
   
   const currentBalance = Number(accountInfo.amount);
   console.log('Current STYD in wallet:', (currentBalance / 1e9).toFixed(2), 'STYD');
