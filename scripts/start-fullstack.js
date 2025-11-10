@@ -5,7 +5,8 @@
 
 const { spawn } = require('child_process');
 const fs = require('fs');
-const bs58 = require('bs58');
+const bs58Lib = require('bs58');
+const bs58 = bs58Lib.decode ? bs58Lib : bs58Lib.default;
 
 console.log('\n🚀 Stealthyield Fullstack Starting...\n');
 console.log('Time:', new Date().toISOString());
@@ -20,7 +21,8 @@ if (!fs.existsSync('./wallets')) {
 if (process.env.DEPLOYER_PRIVATE_KEY_BASE58) {
   console.log('📦 Converting Deployer Base58...');
   try {
-    const privateKeyBytes = bs58.decode(process.env.DEPLOYER_PRIVATE_KEY_BASE58);
+    const decode = bs58.decode || bs58;
+    const privateKeyBytes = decode(process.env.DEPLOYER_PRIVATE_KEY_BASE58);
     const keypairArray = Array.from(privateKeyBytes);
     fs.writeFileSync('./wallets/deployer-wallet.json', JSON.stringify(keypairArray));
     fs.chmodSync('./wallets/deployer-wallet.json', 0o600);
