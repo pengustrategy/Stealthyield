@@ -10,9 +10,35 @@ console.log('\n🤖 Stealthyield Automation Starting...\n');
 console.log('Time:', new Date().toISOString());
 console.log('Environment: Railway\n');
 
+// Handle Base64 encoded wallets (for Railway)
+if (process.env.DEPLOYER_WALLET_BASE64) {
+  console.log('📦 Decoding wallet from Base64...');
+  const walletData = Buffer.from(process.env.DEPLOYER_WALLET_BASE64, 'base64').toString('utf-8');
+  
+  // Ensure wallets directory exists
+  if (!fs.existsSync('./wallets')) {
+    fs.mkdirSync('./wallets', { recursive: true });
+  }
+  
+  fs.writeFileSync('./wallets/deployer-wallet.json', walletData);
+  fs.chmodSync('./wallets/deployer-wallet.json', 0o600);
+  
+  process.env.DEPLOYER_WALLET_PATH = './wallets/deployer-wallet.json';
+  console.log('✅ Deployer wallet decoded');
+}
+
+if (process.env.MOTHERWOMB_WALLET_BASE64) {
+  const walletData = Buffer.from(process.env.MOTHERWOMB_WALLET_BASE64, 'base64').toString('utf-8');
+  fs.writeFileSync('./wallets/motherwomb-wallet.json', walletData);
+  fs.chmodSync('./wallets/motherwomb-wallet.json', 0o600);
+  
+  process.env.MOTHERWOMB_WALLET_PATH = './wallets/motherwomb-wallet.json';
+  console.log('✅ MotherWomb wallet decoded');
+}
+
 // Verify configuration
 if (!process.env.DEPLOYER_WALLET_PATH) {
-  console.error('❌ DEPLOYER_WALLET_PATH not set!');
+  console.error('❌ DEPLOYER_WALLET_PATH or DEPLOYER_WALLET_BASE64 not set!');
   process.exit(1);
 }
 
