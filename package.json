@@ -8,7 +8,9 @@
     "distribute": "node scripts/distribute-rewards.js",
     "start": "node scripts/start-fullstack.js",
     "automation-only": "node scripts/start-automation.js",
-    "frontend": "cd frontend && npm run dev"
+    "frontend": "cd frontend && npm run dev",
+    "convert-keys": "node scripts/convert-keys-to-base58.js",
+    "pre-deploy-check": "node scripts/pre-deploy-check.js"
   },
   "dependencies": {
     "@solana/spl-token": "^0.4.8",

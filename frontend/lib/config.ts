@@ -10,8 +10,8 @@ export const config = {
   motherWombAddress: '5kegRGctwKkdvytig8CeCAzuBQWivTvEtgyePtyVcgtk', // SOL reward pool
   
   // Token (update after creation)
-  tokenMint: process.env.NEXT_PUBLIC_TOKEN_MINT || '',
-  raydiumPool: process.env.NEXT_PUBLIC_RAYDIUM_POOL || '',
+  tokenMint: process.env.NEXT_PUBLIC_TOKEN_MINT || '4spgGcQcHrAXEZfLs5hWJgYNmXcA7mjjiYRMoob1Wz9b',
+  raydiumPool: process.env.NEXT_PUBLIC_RAYDIUM_POOL || 'BeNW14fnU2uJKkvCmtKDRejmFFHM66kW65oAkaUwKYbK',
   
   // Note: No custom program needed! Using Token 2022 only
   

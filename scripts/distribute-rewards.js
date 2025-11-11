@@ -24,6 +24,9 @@ const {
 
 const fs = require('fs');
 
+// Load configuration
+const config = JSON.parse(fs.readFileSync('./config.json'));
+
 // Configuration
 const CONFIG = {
   DAILY_EMISSION: 500_000, // 500K STYD per day
@@ -64,7 +67,7 @@ async function distributeRewards() {
   
   // Connect
   const connection = new Connection(
-    process.env.RPC_URL || 'https://api.devnet.solana.com',
+    process.env.RPC_URL || config.network.rpcUrl,
     'confirmed'
   );
   
@@ -241,21 +244,43 @@ async function fetchHolders(connection, mint) {
 
 function loadState() {
   try {
-    return JSON.parse(fs.readFileSync('./state.json'));
+    const data = JSON.parse(fs.readFileSync('./state.json'));
+    // Add version if not exists
+    if (!data.version) {
+      data.version = '1.0.0';
+    }
+    return data;
   } catch {
     return {
+      version: '1.0.0',
       totalSupply: 1_000_000 * 1e9,
       totalMined: 0,
       totalBurned: 0,
+      motherWombSOL: 0,
+      deployerSOL: 0,
       halvingCount: 0,
       rewardPhase: 0,
       lastEmission: Date.now(),
+      lastFeeProcessing: Date.now(),
     };
   }
 }
 
 function saveState(state) {
-  fs.writeFileSync('./state.json', JSON.stringify(state, null, 2));
+  try {
+    // Backup existing state
+    if (fs.existsSync('./state.json')) {
+      const backup = fs.readFileSync('./state.json');
+      fs.writeFileSync('./state.json.backup', backup);
+    }
+
+    // Save new state
+    state.lastUpdated = Date.now();
+    fs.writeFileSync('./state.json', JSON.stringify(state, null, 2));
+  } catch (error) {
+    console.error('❌ Failed to save state:', error.message);
+    throw error;
+  }
 }
 
 function checkAndUpdateThresholds(state) {

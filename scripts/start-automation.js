@@ -119,12 +119,39 @@ process.on('SIGTERM', () => {
   process.exit(0);
 });
 
-// Health check endpoint (optional)
+// Health check endpoint with detailed status
 const http = require('http');
 const server = http.createServer((req, res) => {
   if (req.url === '/health') {
-    res.writeHead(200);
-    res.end('OK');
+    try {
+      let state = { status: 'initializing' };
+
+      if (fs.existsSync('./state.json')) {
+        state = JSON.parse(fs.readFileSync('./state.json'));
+      }
+
+      const healthData = {
+        status: 'healthy',
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString(),
+        lastFeeProcessing: state.lastFeeProcessing || null,
+        lastEmission: state.lastEmission || null,
+        totalSupply: state.totalSupply ? (state.totalSupply / 1e9).toFixed(2) : '0',
+        totalBurned: state.totalBurned ? (state.totalBurned / 1e9).toFixed(2) : '0',
+        motherWombSOL: state.motherWombSOL || 0,
+        halvingCount: state.halvingCount || 0,
+        rewardPhase: state.rewardPhase || 0,
+      };
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(healthData, null, 2));
+    } catch (error) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ status: 'error', message: error.message }));
+    }
+  } else {
+    res.writeHead(404);
+    res.end('Not Found');
   }
 });
 

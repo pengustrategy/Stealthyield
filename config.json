@@ -34,7 +34,7 @@
     "breederThreshold": 1000,
     "halvingThresholds": [2500000, 5000000, 7500000, 10000000, 12500000],
     "phaseThresholds": [2500000, 5000000, 7500000],
-    "solUnlockPercentages": [5, 25, 50, 100]
+    "solUnlockPercentages": [0, 5, 15, 50]
   },
   "feeProcessing": {
     "burnPercentage": 30,

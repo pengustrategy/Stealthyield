@@ -128,10 +128,13 @@ async function autoProcessFees() {
     return;
   }
   
-  // Step 2: Calculate 30% burn and 70% swap
-  const burnAmount = Math.floor(currentBalance * 0.30);
-  const swapAmount = Math.floor(currentBalance * 0.70);
-  
+  // Step 2: Calculate 30% burn and 70% swap (using config values)
+  const burnPercentage = config.feeProcessing.burnPercentage / 100;
+  const swapPercentage = config.feeProcessing.swapPercentage / 100;
+
+  const burnAmount = Math.floor(currentBalance * burnPercentage);
+  const swapAmount = Math.floor(currentBalance * swapPercentage);
+
   console.log('\n2️⃣ Planning:');
   console.log('  Total:', (currentBalance / 1e9).toFixed(2), 'STYD');
   console.log('  Will Burn (30%):', (burnAmount / 1e9).toFixed(2), 'STYD');
@@ -150,6 +153,16 @@ async function autoProcessFees() {
   if (solReceived === 0) {
     console.log('\n❌ Swap failed! Skipping burn to preserve funds.');
     console.log('💡 Fix Jupiter connection and run again.\n');
+
+    // Log failure to state
+    const state = loadState();
+    state.lastFeeProcessingError = {
+      timestamp: Date.now(),
+      error: 'Jupiter swap failed',
+      amount: swapAmount / 1e9,
+    };
+    saveState(state);
+
     return;
   }
   
@@ -309,20 +322,42 @@ async function swapViaJupiter(connection, wallet, inputMint, amount) {
 
 function loadState() {
   try {
-    return JSON.parse(fs.readFileSync('./state.json'));
+    const data = JSON.parse(fs.readFileSync('./state.json'));
+    // Add version if not exists
+    if (!data.version) {
+      data.version = '1.0.0';
+    }
+    return data;
   } catch {
     return {
+      version: '1.0.0',
       totalSupply: 1_000_000 * 1e9,
       totalMined: 0,
       totalBurned: 0,
       motherWombSOL: 0,
+      deployerSOL: 0,
       lastFeeProcessing: Date.now(),
+      halvingCount: 0,
+      rewardPhase: 0,
     };
   }
 }
 
 function saveState(state) {
-  fs.writeFileSync('./state.json', JSON.stringify(state, null, 2));
+  try {
+    // Backup existing state
+    if (fs.existsSync('./state.json')) {
+      const backup = fs.readFileSync('./state.json');
+      fs.writeFileSync('./state.json.backup', backup);
+    }
+
+    // Save new state
+    state.lastUpdated = Date.now();
+    fs.writeFileSync('./state.json', JSON.stringify(state, null, 2));
+  } catch (error) {
+    console.error('❌ Failed to save state:', error.message);
+    throw error;
+  }
 }
 
 // Run
