@@ -235,11 +235,120 @@ function calculateSOLReward(userLP, totalLP, percentage) {
 }
 
 async function fetchHolders(connection, mint) {
-  // TODO: In production, use getProgramAccounts or indexer
-  // For now, return empty array until real implementation
-  console.log('  ⚠️  Holder querying not implemented yet');
-  console.log('  Skipping distribution (no holders to query)\n');
-  return [];
+  try {
+    console.log('  📡 Fetching token holders from Helius...');
+
+    // Use Helius DAS API to get token accounts
+    const response = await fetch(config.network.rpcUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 'holders-query',
+        method: 'getTokenAccounts',
+        params: {
+          mint: mint.toString(),
+          limit: 1000,
+          options: {
+            showZeroBalance: false,
+          },
+        },
+      }),
+    });
+
+    const data = await response.json();
+
+    // Check for errors
+    if (data.error) {
+      console.error('  ❌ Helius API error:', data.error.message);
+      console.log('  ℹ️  Falling back to getProgramAccounts...');
+      return await fetchHoldersWithProgramAccounts(connection, mint);
+    }
+
+    // Parse token accounts
+    const tokenAccounts = data.result?.token_accounts || [];
+
+    if (tokenAccounts.length === 0) {
+      console.log('  ⚠️  No holders found via Helius API');
+      console.log('  ℹ️  Falling back to getProgramAccounts...');
+      return await fetchHoldersWithProgramAccounts(connection, mint);
+    }
+
+    console.log(`  ✅ Found ${tokenAccounts.length} token holders via Helius`);
+
+    // Convert to our format
+    const holders = tokenAccounts.map(account => ({
+      owner: account.owner,
+      amount: parseInt(account.amount),
+      hasLP: false, // Will be checked separately
+    }));
+
+    return holders;
+
+  } catch (error) {
+    console.error('  ❌ Error fetching holders:', error.message);
+    console.log('  ℹ️  Falling back to getProgramAccounts...');
+    return await fetchHoldersWithProgramAccounts(connection, mint);
+  }
+}
+
+// Fallback method using getProgramAccounts
+async function fetchHoldersWithProgramAccounts(connection, mint) {
+  try {
+    console.log('  📡 Fetching holders via getProgramAccounts...');
+
+    const TOKEN_2022_PROGRAM_ID = new PublicKey('TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb');
+
+    const accounts = await connection.getProgramAccounts(
+      TOKEN_2022_PROGRAM_ID,
+      {
+        filters: [
+          { dataSize: 165 }, // Token account size
+          {
+            memcmp: {
+              offset: 0,
+              bytes: mint.toBase58(),
+            },
+          },
+        ],
+      }
+    );
+
+    console.log(`  ✅ Found ${accounts.length} token accounts`);
+
+    // Parse account data
+    const holders = accounts
+      .map(({ pubkey, account }) => {
+        try {
+          // Token account layout for Token-2022:
+          // 0-32: mint
+          // 32-64: owner
+          // 64-72: amount (u64)
+          const data = account.data;
+          const amount = data.readBigUInt64LE(64);
+          const owner = new PublicKey(data.slice(32, 64));
+
+          return {
+            owner: owner.toString(),
+            amount: Number(amount),
+            hasLP: false,
+          };
+        } catch (error) {
+          console.error('  ⚠️  Failed to parse account:', error.message);
+          return null;
+        }
+      })
+      .filter(holder => holder !== null && holder.amount > 0);
+
+    console.log(`  ✅ Parsed ${holders.length} holders with non-zero balance`);
+
+    return holders;
+
+  } catch (error) {
+    console.error('  ❌ getProgramAccounts failed:', error.message);
+    console.log('  ⚠️  Returning empty holder list');
+    return [];
+  }
 }
 
 function loadState() {

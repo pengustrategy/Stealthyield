@@ -2,8 +2,14 @@
 nixPkgs = ["nodejs_20"]
 
 [phases.install]
-cmds = ["npm install --production=false"]
+cmds = [
+  "npm install --production=false",
+  "cd frontend && npm install"
+]
+
+[phases.build]
+cmds = ["cd frontend && npm run build"]
 
 [start]
-cmd = "node scripts/start-automation.js"
+cmd = "node scripts/start-fullstack.js"
 

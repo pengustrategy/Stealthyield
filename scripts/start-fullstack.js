@@ -15,36 +15,71 @@ if (!fs.existsSync('./wallets')) {
   fs.mkdirSync('./wallets', { recursive: true });
 }
 
-// Use Base64 encoded JSON array (simpler, no bs58 dependency)
-if (process.env.DEPLOYER_WALLET_BASE64) {
-  console.log('📦 Decoding wallet from Base64...');
-  try {
+// Support both Base58 (preferred) and Base64 formats
+const bs58 = require('bs58');
+const { Keypair } = require('@solana/web3.js');
+
+let deployerWallet, motherWombWallet;
+
+try {
+  // Try Base58 format first (preferred for Railway)
+  if (process.env.DEPLOYER_PRIVATE_KEY_BASE58) {
+    console.log('📦 Converting Base58 private key to keypair...');
+
+    const deployerBytes = bs58.decode(process.env.DEPLOYER_PRIVATE_KEY_BASE58);
+    deployerWallet = Keypair.fromSecretKey(deployerBytes);
+
+    // Save to file for scripts
+    fs.writeFileSync(
+      './wallets/deployer-wallet.json',
+      JSON.stringify(Array.from(deployerWallet.secretKey))
+    );
+    fs.chmodSync('./wallets/deployer-wallet.json', 0o600);
+
+    console.log('✅ Deployer wallet created from Base58');
+    console.log('   Address:', deployerWallet.publicKey.toString());
+
+  } else if (process.env.DEPLOYER_WALLET_BASE64) {
+    // Fallback to Base64 format
+    console.log('📦 Decoding wallet from Base64...');
     const walletJSON = Buffer.from(process.env.DEPLOYER_WALLET_BASE64, 'base64').toString('utf-8');
     fs.writeFileSync('./wallets/deployer-wallet.json', walletJSON);
     fs.chmodSync('./wallets/deployer-wallet.json', 0o600);
-    process.env.DEPLOYER_WALLET_PATH = './wallets/deployer-wallet.json';
-    console.log('✅ Deployer wallet created');
-  } catch (error) {
-    console.error('❌ Failed:', error.message);
-    process.exit(1);
+    console.log('✅ Deployer wallet created from Base64');
+
+  } else {
+    throw new Error('Neither DEPLOYER_PRIVATE_KEY_BASE58 nor DEPLOYER_WALLET_BASE64 is set');
   }
-} else {
-  console.error('❌ DEPLOYER_WALLET_BASE64 not set!');
+
+  // MotherWomb wallet (optional)
+  if (process.env.MOTHERWOMB_PRIVATE_KEY_BASE58) {
+    const motherWombBytes = bs58.decode(process.env.MOTHERWOMB_PRIVATE_KEY_BASE58);
+    motherWombWallet = Keypair.fromSecretKey(motherWombBytes);
+
+    fs.writeFileSync(
+      './wallets/motherwomb-wallet.json',
+      JSON.stringify(Array.from(motherWombWallet.secretKey))
+    );
+    fs.chmodSync('./wallets/motherwomb-wallet.json', 0o600);
+
+    console.log('✅ MotherWomb wallet created from Base58');
+    console.log('   Address:', motherWombWallet.publicKey.toString());
+  } else {
+    console.log('⚠️  MOTHERWOMB_PRIVATE_KEY_BASE58 not set');
+    console.log('   Using default address: 5kegRGctwKkdvytig8CeCAzuBQWivTvEtgyePtyVcgtk');
+  }
+
+} catch (error) {
+  console.error('❌ Failed to load wallets:', error.message);
+  console.log('\nPlease set one of the following in Railway Variables:');
+  console.log('  - DEPLOYER_PRIVATE_KEY_BASE58 (recommended)');
+  console.log('  - DEPLOYER_WALLET_BASE64 (legacy)');
   process.exit(1);
 }
 
-// MotherWomb address (no private key needed - only for receiving SOL)
-if (!process.env.MOTHERWOMB_ADDRESS) {
-  // Use default from config
-  process.env.MOTHERWOMB_ADDRESS = '5kegRGctwKkdvytig8CeCAzuBQWivTvEtgyePtyVcgtk';
-  console.log('✅ Using default MotherWomb address');
-}
-
-console.log('MotherWomb Address:', process.env.MOTHERWOMB_ADDRESS);
-
-// Verify
-if (!fs.existsSync(process.env.DEPLOYER_WALLET_PATH || './wallets/deployer-wallet.json')) {
-  console.error('❌ Deployer wallet not found!');
+// Verify deployer wallet exists
+if (!fs.existsSync('./wallets/deployer-wallet.json')) {
+  console.error('❌ Deployer wallet file not created!');
   process.exit(1);
 }
 
